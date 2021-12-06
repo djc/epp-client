@@ -4,44 +4,24 @@ use epp_client_macros::*;
 
 use super::XMLNS;
 use crate::common::{ElementName, NoExtension, StringValue};
-use crate::request::{EppExtension, Transaction};
+use crate::request::Transaction;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct DomainCheck<E> {
-    request: DomainCheckRequest,
-    extension: Option<E>,
+impl Transaction<NoExtension> for DomainCheck {
+    type Response = DomainCheckResponse;
+    type ExtensionResponse = NoExtension;
 }
 
-impl<E: EppExtension> Transaction<E> for DomainCheck<E> {
-    type Input = DomainCheckRequest;
-    type Output = DomainCheckResponse;
-
-    fn into_parts(self) -> (Self::Input, Option<E>) {
-        (self.request, self.extension)
-    }
-}
-
-impl<E: EppExtension> DomainCheck<E> {
-    pub fn new(domains: Vec<&str>) -> DomainCheck<NoExtension> {
-        DomainCheck {
-            request: DomainCheckRequest {
-                list: DomainList {
-                    xmlns: XMLNS.to_string(),
-                    domains: domains
-                        .into_iter()
-                        .map(|d| d.into())
-                        .collect::<Vec<StringValue>>(),
-                },
+impl DomainCheck {
+    pub fn new(domains: Vec<&str>) -> Self {
+        Self {
+            list: DomainList {
+                xmlns: XMLNS.to_string(),
+                domains: domains
+                    .into_iter()
+                    .map(|d| d.into())
+                    .collect::<Vec<StringValue>>(),
             },
-            extension: None,
-        }
-    }
-
-    pub fn with_extension<F: EppExtension>(self, extension: F) -> DomainCheck<F> {
-        DomainCheck {
-            request: self.request,
-            extension: Some(extension),
         }
     }
 }
@@ -62,7 +42,7 @@ pub struct DomainList {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "check")]
 /// Type for EPP XML &lt;check&gt; command for domains
-pub struct DomainCheckRequest {
+pub struct DomainCheck {
     /// The object holding the list of domains to be checked
     #[serde(rename = "domain:check", alias = "check")]
     list: DomainList,

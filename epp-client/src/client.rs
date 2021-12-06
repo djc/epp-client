@@ -36,7 +36,7 @@
 //! println!("{:?}", greeting);
 //!
 //! // Execute an EPP Command against the registry with distinct request and response objects
-//! let domain_check = DomainCheck::<NoExtension>::new(vec!["eppdev.com", "eppdev.net"]);
+//! let domain_check = DomainCheck::new(vec!["eppdev.com", "eppdev.net"]);
 //! let response = client.transact(domain_check, "transaction-id").await.unwrap();
 //! println!("{:?}", response);
 //!
@@ -45,12 +45,15 @@
 
 use std::{error::Error, fmt::Debug};
 
-use crate::common::EppObject;
+use serde::de::DeserializeOwned;
+use serde::Serialize;
+
+use crate::common::{ElementName, EppObject, NoExtension};
 use crate::config::EppClientConfig;
 use crate::error;
 use crate::hello::{Greeting, Hello};
 use crate::registry::{epp_connect, EppConnection};
-use crate::request::{EppExtension, Transaction};
+use crate::request::Transaction;
 use crate::response::Response;
 use crate::xml::EppXml;
 
@@ -81,23 +84,48 @@ impl EppClient {
 
     /// Executes an EPP Hello call and returns the response as an `Greeting`
     pub async fn hello(&mut self) -> Result<Greeting, Box<dyn Error>> {
-        let hello_xml = EppObject::<Hello>::build(Hello).serialize()?;
+        let hello_xml = EppXml::serialize(&EppObject::<Hello>::build(Hello))?;
 
         let response = self.connection.transact(&hello_xml).await?;
 
         Ok(EppObject::<Greeting>::deserialize(&response)?.data)
     }
 
-    pub async fn transact<T, E>(
+    pub async fn transact<T>(
         &mut self,
         request: T,
         id: &str,
-    ) -> Result<Response<<T as Transaction<E>>::Output, E::Response>, error::Error>
+    ) -> Result<
+        Response<
+            <T as Transaction<NoExtension>>::Response,
+            <T as Transaction<NoExtension>>::ExtensionResponse,
+        >,
+        error::Error,
+    >
+    where
+        T: Transaction<NoExtension> + Debug,
+    {
+        let epp_xml = request.serialize_request(None, id)?;
+
+        let response = self.connection.transact(&epp_xml).await?;
+
+        T::deserialize_response(&response)
+    }
+
+    pub async fn transact_with_extension<T, E>(
+        &mut self,
+        request: T,
+        extension: E,
+        id: &str,
+    ) -> Result<
+        Response<<T as Transaction<E>>::Response, <T as Transaction<E>>::ExtensionResponse>,
+        error::Error,
+    >
     where
         T: Transaction<E> + Debug,
-        E: EppExtension,
+        E: ElementName + Serialize + DeserializeOwned + Sized + Debug,
     {
-        let epp_xml = request.serialize_request(id)?;
+        let epp_xml = request.serialize_request(Some(extension), id)?;
 
         let response = self.connection.transact(&epp_xml).await?;
 

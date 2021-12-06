@@ -6,58 +6,12 @@ use super::XMLNS;
 use crate::common::{
     DomainAuthInfo, DomainContact, ElementName, HostList, NoExtension, Period, StringValue,
 };
-use crate::request::{EppExtension, Transaction};
+use crate::request::Transaction;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct DomainCreate<E> {
-    request: DomainCreateRequest,
-    extension: Option<E>,
-}
-
-impl<E: EppExtension> Transaction<E> for DomainCreate<E> {
-    type Input = DomainCreateRequest;
-    type Output = DomainCreateResponse;
-
-    fn into_parts(self) -> (Self::Input, Option<E>) {
-        (self.request, self.extension)
-    }
-}
-
-impl<E: EppExtension> DomainCreate<E> {
-    pub fn new(
-        name: &str,
-        period: u16,
-        ns: Option<HostList>,
-        registrant_id: Option<&str>,
-        auth_password: &str,
-        contacts: Option<Vec<DomainContact>>,
-    ) -> DomainCreate<NoExtension> {
-        let registrant = registrant_id.map(|id| id.into());
-        let domain_create = DomainCreateRequest {
-            domain: DomainCreateRequestData {
-                xmlns: XMLNS.to_string(),
-                name: name.into(),
-                period: Period::new(period),
-                ns,
-                registrant,
-                auth_info: DomainAuthInfo::new(auth_password),
-                contacts,
-            },
-        };
-
-        DomainCreate {
-            request: domain_create,
-            extension: None,
-        }
-    }
-
-    pub fn with_extension<F: EppExtension>(self, extension: F) -> DomainCreate<F> {
-        DomainCreate {
-            request: self.request,
-            extension: Some(extension),
-        }
-    }
+impl Transaction<NoExtension> for DomainCreate {
+    type Response = DomainCreateResponse;
+    type ExtensionResponse = NoExtension;
 }
 
 // Request
@@ -92,12 +46,35 @@ pub struct DomainCreateRequestData {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "create")]
 /// Type for EPP XML &lt;create&gt; command for domains
-pub struct DomainCreateRequest {
+pub struct DomainCreate {
     /// The data for the domain to be created with
     /// T being the type of nameserver list (`HostObjList` or `HostAttrList`)
     /// to be supplied
     #[serde(rename = "domain:create", alias = "create")]
     pub domain: DomainCreateRequestData,
+}
+
+impl DomainCreate {
+    pub fn new(
+        name: &str,
+        period: u16,
+        ns: Option<HostList>,
+        registrant_id: Option<&str>,
+        auth_password: &str,
+        contacts: Option<Vec<DomainContact>>,
+    ) -> Self {
+        Self {
+            domain: DomainCreateRequestData {
+                xmlns: XMLNS.to_string(),
+                name: name.into(),
+                period: Period::new(period),
+                ns,
+                registrant: registrant_id.map(|id| id.into()),
+                auth_info: DomainAuthInfo::new(auth_password),
+                contacts,
+            },
+        }
+    }
 }
 
 // Response

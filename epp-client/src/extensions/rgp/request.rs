@@ -2,18 +2,30 @@
 
 use epp_client_macros::*;
 
-use crate::common::ElementName;
-
-use crate::request::EppExtension;
+use crate::{
+    common::{ElementName, NoExtension},
+    domain::{info::DomainInfo, update::DomainUpdate},
+    request::Transaction,
+};
 
 use serde::{Deserialize, Serialize};
 
 use super::XMLNS;
 
+impl Transaction<RgpRestoreRequest> for DomainUpdate {
+    type Response = ();
+    type ExtensionResponse = RgpRequestResponse;
+}
+
+impl Transaction<RgpRestoreRequest> for DomainInfo {
+    type Response = <DomainInfo as Transaction<NoExtension>>::Response;
+    type ExtensionResponse = RgpRequestResponse;
+}
+
 impl RgpRestoreRequest {
     /// Creates a new instance of EppDomainRgpRestoreRequest
-    pub fn new() -> RgpRestoreRequest {
-        RgpRestoreRequest {
+    pub fn new() -> Self {
+        Self {
             xmlns: XMLNS.to_string(),
             restore: RgpRestoreRequestData {
                 op: "request".to_string(),
@@ -26,10 +38,6 @@ impl Default for RgpRestoreRequest {
     fn default() -> Self {
         Self::new()
     }
-}
-
-impl EppExtension for RgpRestoreRequest {
-    type Response = RgpRequestResponse;
 }
 
 // Request

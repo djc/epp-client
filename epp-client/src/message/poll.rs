@@ -1,42 +1,12 @@
-//! Types for EPP message poll request
-
 use epp_client_macros::*;
 
 use crate::common::{ElementName, NoExtension, StringValue};
-use crate::request::{EppExtension, Transaction};
+use crate::request::Transaction;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct MessagePoll<E> {
-    request: MessagePollRequest,
-    extension: Option<E>,
-}
-
-impl<E: EppExtension> Transaction<E> for MessagePoll<E> {
-    type Input = MessagePollRequest;
-    type Output = MessagePollResponse;
-
-    fn into_parts(self) -> (Self::Input, Option<E>) {
-        (self.request, self.extension)
-    }
-}
-
-impl<E: EppExtension> MessagePoll<E> {
-    pub fn new() -> MessagePoll<NoExtension> {
-        MessagePoll {
-            request: MessagePollRequest {
-                op: "req".to_string(),
-            },
-            extension: None,
-        }
-    }
-
-    pub fn with_extension<F: EppExtension>(self, extension: F) -> MessagePoll<F> {
-        MessagePoll {
-            request: self.request,
-            extension: Some(extension),
-        }
-    }
+impl Transaction<NoExtension> for MessagePoll {
+    type Response = MessagePollResponse;
+    type ExtensionResponse = NoExtension;
 }
 
 // Request
@@ -44,10 +14,18 @@ impl<E: EppExtension> MessagePoll<E> {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "poll")]
 /// Type for EPP XML &lt;poll&gt; command for message poll
-pub struct MessagePollRequest {
+pub struct MessagePoll {
     /// The type of operation to perform
     /// The value is "req" for message polling
     op: String,
+}
+
+impl Default for MessagePoll {
+    fn default() -> Self {
+        Self {
+            op: "req".to_owned(),
+        }
+    }
 }
 
 // Response

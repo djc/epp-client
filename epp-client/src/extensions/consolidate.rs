@@ -8,10 +8,16 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     common::{ElementName, NoExtension, StringValue},
-    request::EppExtension,
+    domain::update::DomainUpdate,
+    request::Transaction,
 };
 
 pub const XMLNS: &str = "http://www.verisign.com/epp/sync-1.0";
+
+impl Transaction<Sync> for DomainUpdate {
+    type Response = <DomainUpdate as Transaction<NoExtension>>::Response;
+    type ExtensionResponse = NoExtension;
+}
 
 #[derive(PartialEq, Debug)]
 pub struct GMonthDay {
@@ -56,16 +62,12 @@ impl fmt::Display for GMonthDay {
 
 impl Sync {
     /// Create a new RGP restore report request
-    pub fn new(expiration: GMonthDay) -> Sync {
-        Sync {
+    pub fn new(expiration: GMonthDay) -> Self {
+        Self {
             xmlns: XMLNS.to_string(),
             exp: expiration.to_string().into(),
         }
     }
-}
-
-impl EppExtension for Sync {
-    type Response = NoExtension;
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]

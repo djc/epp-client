@@ -4,11 +4,17 @@ use epp_client_macros::ElementName;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    common::{ElementName, StringValue},
-    request::EppExtension,
+    common::{ElementName, NoExtension, StringValue},
+    domain::check::DomainCheck,
+    request::Transaction,
 };
 
 pub const XMLNS: &str = "http://www.verisign-grs.com/epp/namestoreExt-1.1";
+
+impl Transaction<NameStore> for DomainCheck {
+    type Response = <DomainCheck as Transaction<NoExtension>>::Response;
+    type ExtensionResponse = NameStore;
+}
 
 impl NameStore {
     /// Create a new RGP restore report request
@@ -18,10 +24,6 @@ impl NameStore {
             subproduct: subproduct.into(),
         }
     }
-}
-
-impl EppExtension for NameStore {
-    type Response = NameStore;
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]

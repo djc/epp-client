@@ -5,8 +5,6 @@ use std::{fmt::Display, str::FromStr};
 use epp_client_macros::ElementName;
 use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
 
-use crate::request::EppExtension;
-
 const EPP_XMLNS: &str = "urn:ietf:params:xml:ns:epp-1.0";
 
 /// Wraps String for easier serialization to and from values that are inner text
@@ -41,10 +39,6 @@ pub trait ElementName {
 #[element_name(name = "empty")]
 /// An empty placeholder tag. To be refactored to something more compliant later.
 pub struct NoExtension;
-
-impl EppExtension for NoExtension {
-    type Response = NoExtension;
-}
 
 /// An EPP XML Document that is used either as an EPP XML request or
 /// an EPP XML response

@@ -6,43 +6,23 @@ use epp_client_macros::*;
 
 use super::XMLNS;
 use crate::common::{ElementName, NoExtension, StringValue};
-use crate::request::{EppExtension, Transaction};
+use crate::request::Transaction;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct HostCheck<E> {
-    request: HostCheckRequest,
-    extension: Option<E>,
+impl Transaction<NoExtension> for HostCheck {
+    type Response = HostCheckResponse;
+    type ExtensionResponse = NoExtension;
 }
 
-impl<E: EppExtension> Transaction<E> for HostCheck<E> {
-    type Input = HostCheckRequest;
-    type Output = HostCheckResponse;
-
-    fn into_parts(self) -> (Self::Input, Option<E>) {
-        (self.request, self.extension)
-    }
-}
-
-impl<E: EppExtension> HostCheck<E> {
-    pub fn new(hosts: &[&str]) -> HostCheck<NoExtension> {
+impl HostCheck {
+    pub fn new(hosts: &[&str]) -> Self {
         let hosts = hosts.iter().map(|&d| d.into()).collect();
 
-        HostCheck {
-            request: HostCheckRequest {
-                list: HostList {
-                    xmlns: XMLNS.to_string(),
-                    hosts,
-                },
+        Self {
+            list: HostList {
+                xmlns: XMLNS.to_string(),
+                hosts,
             },
-            extension: None,
-        }
-    }
-
-    pub fn with_extension<F: EppExtension>(self, extension: F) -> HostCheck<F> {
-        HostCheck {
-            request: self.request,
-            extension: Some(extension),
         }
     }
 }
@@ -63,7 +43,7 @@ pub struct HostList {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "check")]
 /// Type for EPP XML &lt;check&gt; command for hosts
-pub struct HostCheckRequest {
+pub struct HostCheck {
     /// The instance holding the list of hosts to be checked
     #[serde(rename = "host:check", alias = "check")]
     list: HostList,

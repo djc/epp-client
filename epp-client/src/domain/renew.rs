@@ -4,45 +4,25 @@ use epp_client_macros::*;
 
 use super::XMLNS;
 use crate::common::{ElementName, NoExtension, Period, StringValue};
-use crate::request::{EppExtension, Transaction};
+use crate::request::Transaction;
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct DomainRenew<E> {
-    request: DomainRenewRequest,
-    extension: Option<E>,
+impl Transaction<NoExtension> for DomainRenew {
+    type Response = DomainRenewResponse;
+    type ExtensionResponse = NoExtension;
 }
 
-impl<E: EppExtension> Transaction<E> for DomainRenew<E> {
-    type Input = DomainRenewRequest;
-    type Output = DomainRenewResponse;
-
-    fn into_parts(self) -> (Self::Input, Option<E>) {
-        (self.request, self.extension)
-    }
-}
-
-impl<E: EppExtension> DomainRenew<E> {
-    pub fn new(name: &str, current_expiry_date: NaiveDate, years: u16) -> DomainRenew<NoExtension> {
+impl DomainRenew {
+    pub fn new(name: &str, current_expiry_date: NaiveDate, years: u16) -> Self {
         let exp_date_str = current_expiry_date.format("%Y-%m-%d").to_string().into();
-        DomainRenew {
-            request: DomainRenewRequest {
-                domain: DomainRenewRequestData {
-                    xmlns: XMLNS.to_string(),
-                    name: name.into(),
-                    current_expiry_date: exp_date_str,
-                    period: Period::new(years),
-                },
+        Self {
+            domain: DomainRenewRequestData {
+                xmlns: XMLNS.to_string(),
+                name: name.into(),
+                current_expiry_date: exp_date_str,
+                period: Period::new(years),
             },
-            extension: None,
-        }
-    }
-
-    pub fn with_extension<F: EppExtension>(self, extension: F) -> DomainRenew<F> {
-        DomainRenew {
-            request: self.request,
-            extension: Some(extension),
         }
     }
 }
@@ -69,7 +49,7 @@ pub struct DomainRenewRequestData {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "renew")]
 /// Type for EPP XML &lt;renew&gt; command for domains
-pub struct DomainRenewRequest {
+pub struct DomainRenew {
     /// The data under the &lt;renew&gt; tag for the domain renewal
     #[serde(rename = "domain:renew", alias = "renew")]
     domain: DomainRenewRequestData,

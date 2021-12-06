@@ -4,59 +4,12 @@ use epp_client_macros::*;
 
 use super::XMLNS;
 use crate::common::{ContactAuthInfo, ElementName, NoExtension, Phone, PostalInfo, StringValue};
-use crate::request::{EppExtension, Transaction};
+use crate::request::Transaction;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct ContactCreate<E> {
-    request: ContactCreateRequest,
-    extension: Option<E>,
-}
-
-impl<E: EppExtension> Transaction<E> for ContactCreate<E> {
-    type Input = ContactCreateRequest;
-    type Output = ContactCreateResponse;
-
-    fn into_parts(self) -> (Self::Input, Option<E>) {
-        (self.request, self.extension)
-    }
-}
-
-impl<E: EppExtension> ContactCreate<E> {
-    pub fn new(
-        id: &str,
-        email: &str,
-        postal_info: PostalInfo,
-        voice: Phone,
-        auth_password: &str,
-    ) -> ContactCreate<NoExtension> {
-        ContactCreate {
-            request: ContactCreateRequest {
-                contact: Contact {
-                    xmlns: XMLNS.to_string(),
-                    id: id.into(),
-                    postal_info,
-                    voice,
-                    fax: None,
-                    email: email.into(),
-                    auth_info: ContactAuthInfo::new(auth_password),
-                },
-            },
-            extension: None,
-        }
-    }
-
-    pub fn with_extension<F: EppExtension>(self, extension: F) -> ContactCreate<F> {
-        ContactCreate {
-            request: self.request,
-            extension: Some(extension),
-        }
-    }
-
-    /// Sets the &lt;fax&gt; data for the request
-    pub fn set_fax(&mut self, fax: Phone) {
-        self.request.contact.fax = Some(fax);
-    }
+impl Transaction<NoExtension> for ContactCreate {
+    type Response = ContactCreateResponse;
+    type ExtensionResponse = NoExtension;
 }
 
 // Request
@@ -90,10 +43,37 @@ pub struct Contact {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "create")]
 /// Type for EPP XML &lt;create&gt; command for contacts
-pub struct ContactCreateRequest {
+pub struct ContactCreate {
     /// Data for &lt;create&gt; command for contact
     #[serde(rename = "contact:create", alias = "create")]
     pub contact: Contact,
+}
+
+impl ContactCreate {
+    pub fn new(
+        id: &str,
+        email: &str,
+        postal_info: PostalInfo,
+        voice: Phone,
+        auth_password: &str,
+    ) -> Self {
+        Self {
+            contact: Contact {
+                xmlns: XMLNS.to_string(),
+                id: id.into(),
+                postal_info,
+                voice,
+                fax: None,
+                email: email.into(),
+                auth_info: ContactAuthInfo::new(auth_password),
+            },
+        }
+    }
+
+    /// Sets the &lt;fax&gt; data for the request
+    pub fn set_fax(&mut self, fax: Phone) {
+        self.contact.fax = Some(fax);
+    }
 }
 
 // Response

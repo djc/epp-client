@@ -14,26 +14,31 @@ pub const EPP_VERSION: &str = "1.0";
 pub const EPP_LANG: &str = "en";
 
 /// Trait to set correct value for xml tags when tags are being generated from generic types
-pub trait Transaction<E: EppExtension>: Sized + Debug {
-    type Input: ElementName + DeserializeOwned + Serialize + Sized + Debug;
-    type Output: DeserializeOwned + Serialize + Debug;
+pub trait Transaction<Ext: ElementName + DeserializeOwned + Serialize + Sized + Debug>:
+    ElementName + DeserializeOwned + Serialize + Sized + Debug
+{
+    type Response: DeserializeOwned + Serialize + Debug;
+    type ExtensionResponse: ElementName + DeserializeOwned + Serialize + Debug;
 
-    fn into_parts(self) -> (Self::Input, Option<E>);
-
-    fn serialize_request(self, client_tr_id: &str) -> Result<String, Box<dyn std::error::Error>> {
-        let (command, extension) = self.into_parts();
-        let extension = extension.map(|data| Extension { data });
+    fn serialize_request(
+        self,
+        extension: Option<Ext>,
+        client_tr_id: &str,
+    ) -> Result<String, Box<dyn std::error::Error>> {
         EppXml::serialize(&EppObject::build(Command {
-            command,
-            extension,
+            command: self,
+            extension: extension.map(|data| Extension { data }),
             client_tr_id: client_tr_id.into(),
         }))
     }
 
     fn deserialize_response(
         epp_xml: &str,
-    ) -> Result<Response<Self::Output, E::Response>, crate::error::Error> {
-        let rsp = <EppObject<Response<Self::Output, E::Response>> as EppXml>::deserialize(epp_xml)?;
+    ) -> Result<Response<Self::Response, Self::ExtensionResponse>, crate::error::Error> {
+        let rsp =
+            <EppObject<Response<Self::Response, Self::ExtensionResponse>> as EppXml>::deserialize(
+                epp_xml,
+            )?;
         match rsp.data.result.code {
             0..=2000 => Ok(rsp.data),
             _ => Err(crate::error::Error::EppCommandError(ResponseStatus {
@@ -42,10 +47,6 @@ pub trait Transaction<E: EppExtension>: Sized + Debug {
             })),
         }
     }
-}
-
-pub trait EppExtension: ElementName + DeserializeOwned + Serialize + Sized + Debug {
-    type Response: ElementName + DeserializeOwned + Serialize + Debug;
 }
 
 #[derive(Deserialize, Debug, PartialEq, ElementName)]

@@ -2,12 +2,20 @@
 
 use epp_client_macros::*;
 
-use crate::common::{ElementName, NoExtension, StringValue};
-use crate::request::EppExtension;
+use crate::{
+    common::{ElementName, NoExtension, StringValue},
+    domain::update::DomainUpdate,
+    request::Transaction,
+};
 use chrono::{DateTime, SecondsFormat, Utc};
 use serde::{Deserialize, Serialize};
 
 use super::XMLNS;
+
+impl Transaction<RgpRestoreReport> for DomainUpdate {
+    type Response = ();
+    type ExtensionResponse = NoExtension;
+}
 
 impl RgpRestoreReport {
     /// Create a new RGP restore report request
@@ -42,10 +50,6 @@ impl RgpRestoreReport {
             },
         }
     }
-}
-
-impl EppExtension for RgpRestoreReport {
-    type Response = NoExtension;
 }
 
 /// Type corresponding to the &lt;report&gt; section in the EPP rgp restore extension

@@ -4,41 +4,21 @@ use epp_client_macros::*;
 
 use super::XMLNS;
 use crate::common::{ElementName, HostAddr, HostStatus, NoExtension, StringValue};
-use crate::request::{EppExtension, Transaction};
+use crate::request::Transaction;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct HostInfo<E> {
-    request: HostInfoRequest,
-    extension: Option<E>,
+impl Transaction<NoExtension> for HostInfo {
+    type Response = HostInfoResponse;
+    type ExtensionResponse = NoExtension;
 }
 
-impl<E: EppExtension> Transaction<E> for HostInfo<E> {
-    type Input = HostInfoRequest;
-    type Output = HostInfoResponse;
-
-    fn into_parts(self) -> (Self::Input, Option<E>) {
-        (self.request, self.extension)
-    }
-}
-
-impl<E: EppExtension> HostInfo<E> {
-    pub fn new(name: &str) -> HostInfo<NoExtension> {
-        HostInfo {
-            request: HostInfoRequest {
-                info: HostInfoRequestData {
-                    xmlns: XMLNS.to_string(),
-                    name: name.into(),
-                },
+impl HostInfo {
+    pub fn new(name: &str) -> Self {
+        Self {
+            info: HostInfoRequestData {
+                xmlns: XMLNS.to_string(),
+                name: name.into(),
             },
-            extension: None,
-        }
-    }
-
-    pub fn with_extension<F: EppExtension>(self, extension: F) -> HostInfo<F> {
-        HostInfo {
-            request: self.request,
-            extension: Some(extension),
         }
     }
 }
@@ -59,7 +39,7 @@ pub struct HostInfoRequestData {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "info")]
 /// Type for EPP XML &lt;info&gt; command for hosts
-pub struct HostInfoRequest {
+pub struct HostInfo {
     /// The instance holding the data for the host query
     #[serde(rename = "host:info", alias = "info")]
     info: HostInfoRequestData,

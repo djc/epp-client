@@ -4,61 +4,40 @@ use epp_client_macros::*;
 
 use super::XMLNS;
 use crate::common::{ElementName, HostAddr, HostStatus, NoExtension, StringValue};
-use crate::request::{EppExtension, Transaction};
-use crate::response::ResponseStatus;
+use crate::request::Transaction;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct HostUpdate<E> {
-    request: HostUpdateRequest,
-    extension: Option<E>,
+impl Transaction<NoExtension> for HostUpdate {
+    type Response = ();
+    type ExtensionResponse = NoExtension;
 }
 
-impl<E: EppExtension> Transaction<E> for HostUpdate<E> {
-    type Input = HostUpdateRequest;
-    type Output = ResponseStatus;
-
-    fn into_parts(self) -> (Self::Input, Option<E>) {
-        (self.request, self.extension)
-    }
-}
-
-impl<E: EppExtension> HostUpdate<E> {
-    pub fn new(name: &str) -> HostUpdate<NoExtension> {
-        HostUpdate {
-            request: HostUpdateRequest {
-                host: HostUpdateRequestData {
-                    xmlns: XMLNS.to_string(),
-                    name: name.into(),
-                    add: None,
-                    remove: None,
-                    change_info: None,
-                },
+impl HostUpdate {
+    pub fn new(name: &str) -> Self {
+        Self {
+            host: HostUpdateRequestData {
+                xmlns: XMLNS.to_string(),
+                name: name.into(),
+                add: None,
+                remove: None,
+                change_info: None,
             },
-            extension: None,
-        }
-    }
-
-    pub fn with_extension<F: EppExtension>(self, extension: F) -> HostUpdate<F> {
-        HostUpdate {
-            request: self.request,
-            extension: Some(extension),
         }
     }
 
     /// Sets the data for the &lt;chg&gt; element of the host update
     pub fn info(&mut self, info: HostChangeInfo) {
-        self.request.host.change_info = Some(info);
+        self.host.change_info = Some(info);
     }
 
     /// Sets the data for the &lt;add&gt; element of the host update
     pub fn add(&mut self, add: HostAddRemove) {
-        self.request.host.add = Some(add);
+        self.host.add = Some(add);
     }
 
     /// Sets the data for the &lt;rem&gt; element of the host update
     pub fn remove(&mut self, remove: HostAddRemove) {
-        self.request.host.remove = Some(remove);
+        self.host.remove = Some(remove);
     }
 }
 
@@ -104,7 +83,7 @@ pub struct HostUpdateRequestData {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "update")]
 /// Type for EPP XML &lt;update&gt; command for hosts
-pub struct HostUpdateRequest {
+pub struct HostUpdate {
     /// The instance holding the data for the host to be updated
     #[serde(rename = "host:update", alias = "update")]
     host: HostUpdateRequestData,

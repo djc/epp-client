@@ -4,42 +4,22 @@ use epp_client_macros::*;
 
 use super::XMLNS;
 use crate::common::{ElementName, NoExtension, StringValue};
-use crate::request::{EppExtension, Transaction};
+use crate::request::Transaction;
 use crate::response::ResponseStatus;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct DomainDelete<E> {
-    request: DomainDeleteRequest,
-    extension: Option<E>,
+impl Transaction<NoExtension> for DomainDelete {
+    type Response = ResponseStatus;
+    type ExtensionResponse = NoExtension;
 }
 
-impl<E: EppExtension> Transaction<E> for DomainDelete<E> {
-    type Input = DomainDeleteRequest;
-    type Output = ResponseStatus;
-
-    fn into_parts(self) -> (Self::Input, Option<E>) {
-        (self.request, self.extension)
-    }
-}
-
-impl<E: EppExtension> DomainDelete<E> {
-    pub fn new(name: &str) -> DomainDelete<NoExtension> {
-        DomainDelete {
-            request: DomainDeleteRequest {
-                domain: DomainDeleteRequestData {
-                    xmlns: XMLNS.to_string(),
-                    name: name.into(),
-                },
+impl DomainDelete {
+    pub fn new(name: &str) -> Self {
+        Self {
+            domain: DomainDeleteRequestData {
+                xmlns: XMLNS.to_string(),
+                name: name.into(),
             },
-            extension: None,
-        }
-    }
-
-    pub fn with_extension<F: EppExtension>(self, extension: F) -> DomainDelete<F> {
-        DomainDelete {
-            request: self.request,
-            extension: Some(extension),
         }
     }
 }
@@ -58,7 +38,7 @@ pub struct DomainDeleteRequestData {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "delete")]
 /// Type for EPP XML &lt;delete&gt; command for domains
-pub struct DomainDeleteRequest {
+pub struct DomainDelete {
     /// The data under the &lt;delete&gt; tag for domain deletion
     #[serde(rename = "domain:delete", alias = "delete")]
     domain: DomainDeleteRequestData,

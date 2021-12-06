@@ -4,42 +4,22 @@ use epp_client_macros::*;
 
 use super::XMLNS;
 use crate::common::{ElementName, HostAddr, NoExtension, StringValue};
-use crate::request::{EppExtension, Transaction};
+use crate::request::Transaction;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct HostCreate<E> {
-    request: HostCreateRequest,
-    extension: Option<E>,
+impl Transaction<NoExtension> for HostCreate {
+    type Response = HostCreateResponse;
+    type ExtensionResponse = NoExtension;
 }
 
-impl<E: EppExtension> Transaction<E> for HostCreate<E> {
-    type Input = HostCreateRequest;
-    type Output = HostCreateResponse;
-
-    fn into_parts(self) -> (Self::Input, Option<E>) {
-        (self.request, self.extension)
-    }
-}
-
-impl<E: EppExtension> HostCreate<E> {
-    pub fn new(host: &str, addresses: Vec<HostAddr>) -> HostCreate<NoExtension> {
-        HostCreate {
-            request: HostCreateRequest {
-                host: HostCreateRequestData {
-                    xmlns: XMLNS.to_string(),
-                    name: host.into(),
-                    addresses: Some(addresses),
-                },
+impl HostCreate {
+    pub fn new(host: &str, addresses: Vec<HostAddr>) -> Self {
+        Self {
+            host: HostCreateRequestData {
+                xmlns: XMLNS.to_string(),
+                name: host.into(),
+                addresses: Some(addresses),
             },
-            extension: None,
-        }
-    }
-
-    pub fn with_extension<F: EppExtension>(self, extension: F) -> HostCreate<F> {
-        HostCreate {
-            request: self.request,
-            extension: Some(extension),
         }
     }
 }
@@ -63,7 +43,7 @@ pub struct HostCreateRequestData {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "create")]
 /// Type for EPP XML &lt;create&gt; command for hosts
-pub struct HostCreateRequest {
+pub struct HostCreate {
     /// The instance holding the data for the host to be created
     #[serde(rename = "host:create", alias = "create")]
     host: HostCreateRequestData,

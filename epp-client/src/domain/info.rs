@@ -6,47 +6,27 @@ use super::XMLNS;
 use crate::common::{
     DomainAuthInfo, DomainContact, DomainStatus, ElementName, HostAttr, NoExtension, StringValue,
 };
-use crate::request::{EppExtension, Transaction};
+use crate::request::Transaction;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct DomainInfo<E> {
-    request: DomainInfoRequest,
-    extension: Option<E>,
+impl Transaction<NoExtension> for DomainInfo {
+    type Response = DomainInfoResponse;
+    type ExtensionResponse = NoExtension;
 }
 
-impl<E: EppExtension> Transaction<E> for DomainInfo<E> {
-    type Input = DomainInfoRequest;
-    type Output = DomainInfoResponse;
-
-    fn into_parts(self) -> (Self::Input, Option<E>) {
-        (self.request, self.extension)
-    }
-}
-
-impl<E: EppExtension> DomainInfo<E> {
-    pub fn new(name: &str, auth_password: Option<&str>) -> DomainInfo<NoExtension> {
-        DomainInfo {
-            request: DomainInfoRequest {
-                info: DomainInfoRequestData {
-                    xmlns: XMLNS.to_string(),
-                    domain: Domain {
-                        hosts: "all".to_string(),
-                        name: name.to_string(),
-                    },
-                    auth_info: auth_password.map(|password| DomainAuthInfo {
-                        password: password.into(),
-                    }),
+impl DomainInfo {
+    pub fn new(name: &str, auth_password: Option<&str>) -> Self {
+        Self {
+            info: DomainInfoRequestData {
+                xmlns: XMLNS.to_string(),
+                domain: Domain {
+                    hosts: "all".to_string(),
+                    name: name.to_string(),
                 },
+                auth_info: auth_password.map(|password| DomainAuthInfo {
+                    password: password.into(),
+                }),
             },
-            extension: None,
-        }
-    }
-
-    pub fn with_extension<F: EppExtension>(self, extension: F) -> DomainInfo<F> {
-        DomainInfo {
-            request: self.request,
-            extension: Some(extension),
         }
     }
 }
@@ -80,7 +60,7 @@ pub struct DomainInfoRequestData {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "info")]
 /// Type for EPP XML &lt;info&gt; command for domains
-pub struct DomainInfoRequest {
+pub struct DomainInfo {
     /// The data under the &lt;info&gt; tag for domain info
     #[serde(rename = "domain:info", alias = "info")]
     info: DomainInfoRequestData,

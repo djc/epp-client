@@ -6,44 +6,12 @@ use super::XMLNS;
 use crate::common::{
     ContactAuthInfo, ContactStatus, ElementName, NoExtension, Phone, PostalInfo, StringValue,
 };
-use crate::request::{EppExtension, Transaction};
+use crate::request::Transaction;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct ContactInfo<E> {
-    request: ContactInfoRequest,
-    extension: Option<E>,
-}
-
-impl<E: EppExtension> Transaction<E> for ContactInfo<E> {
-    type Input = ContactInfoRequest;
-    type Output = ContactInfoResponse;
-
-    fn into_parts(self) -> (Self::Input, Option<E>) {
-        (self.request, self.extension)
-    }
-}
-
-impl<E: EppExtension> ContactInfo<E> {
-    pub fn new(id: &str, auth_password: &str) -> ContactInfo<NoExtension> {
-        ContactInfo {
-            request: ContactInfoRequest {
-                info: ContactInfoRequestData {
-                    xmlns: XMLNS.to_string(),
-                    id: id.into(),
-                    auth_info: ContactAuthInfo::new(auth_password),
-                },
-            },
-            extension: None,
-        }
-    }
-
-    pub fn with_extension<F: EppExtension>(self, extension: F) -> ContactInfo<F> {
-        ContactInfo {
-            request: self.request,
-            extension: Some(extension),
-        }
-    }
+impl Transaction<NoExtension> for ContactInfo {
+    type Response = ContactInfoResponse;
+    type ExtensionResponse = NoExtension;
 }
 
 // Request
@@ -65,10 +33,22 @@ pub struct ContactInfoRequestData {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "info")]
 /// Type for EPP XML &lt;info&gt; command for contacts
-pub struct ContactInfoRequest {
+pub struct ContactInfo {
     /// Data for &lt;info&gt; command for contact
     #[serde(rename = "contact:info", alias = "info")]
     info: ContactInfoRequestData,
+}
+
+impl ContactInfo {
+    pub fn new(id: &str, auth_password: &str) -> ContactInfo {
+        Self {
+            info: ContactInfoRequestData {
+                xmlns: XMLNS.to_string(),
+                id: id.into(),
+                auth_info: ContactAuthInfo::new(auth_password),
+            },
+        }
+    }
 }
 
 // Response

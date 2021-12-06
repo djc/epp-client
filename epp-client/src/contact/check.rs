@@ -5,48 +5,12 @@ use epp_client_macros::*;
 
 use super::XMLNS;
 use crate::common::{ElementName, NoExtension, StringValue};
-use crate::request::{EppExtension, Transaction};
+use crate::request::Transaction;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct ContactCheck<E> {
-    request: ContactCheckRequest,
-    extension: Option<E>,
-}
-
-impl<E: EppExtension> Transaction<E> for ContactCheck<E> {
-    type Input = ContactCheckRequest;
-    type Output = ContactCheckResponse;
-
-    fn into_parts(self) -> (Self::Input, Option<E>) {
-        (self.request, self.extension)
-    }
-}
-
-impl<E: EppExtension> ContactCheck<E> {
-    pub fn new(contact_ids: &[&str]) -> ContactCheck<NoExtension> {
-        let contact_ids = contact_ids
-            .iter()
-            .map(|&d| d.into())
-            .collect::<Vec<StringValue>>();
-
-        ContactCheck {
-            request: ContactCheckRequest {
-                list: ContactList {
-                    xmlns: XMLNS.to_string(),
-                    contact_ids,
-                },
-            },
-            extension: None,
-        }
-    }
-
-    pub fn with_extension<F: EppExtension>(self, extension: F) -> ContactCheck<F> {
-        ContactCheck {
-            request: self.request,
-            extension: Some(extension),
-        }
-    }
+impl Transaction<NoExtension> for ContactCheck {
+    type Response = ContactCheckResponse;
+    type ExtensionResponse = NoExtension;
 }
 
 // Request
@@ -65,10 +29,26 @@ pub struct ContactList {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "check")]
 /// The &lt;command&gt; type for contact check command
-pub struct ContactCheckRequest {
+pub struct ContactCheck {
     /// The &lt;check&gt; tag for the contact check command
     #[serde(rename = "contact:check", alias = "check")]
     list: ContactList,
+}
+
+impl ContactCheck {
+    pub fn new(contact_ids: &[&str]) -> Self {
+        let contact_ids = contact_ids
+            .iter()
+            .map(|&d| d.into())
+            .collect::<Vec<StringValue>>();
+
+        Self {
+            list: ContactList {
+                xmlns: XMLNS.to_string(),
+                contact_ids,
+            },
+        }
+    }
 }
 
 // Response
