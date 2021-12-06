@@ -14,7 +14,7 @@ pub const EPP_VERSION: &str = "1.0";
 pub const EPP_LANG: &str = "en";
 
 /// Trait to set correct value for xml tags when tags are being generated from generic types
-pub trait EppRequest<E: EppExtension>: Sized + Debug {
+pub trait Transaction<E: EppExtension>: Sized + Debug {
     type Input: ElementName + DeserializeOwned + Serialize + Sized + Debug;
     type Output: DeserializeOwned + Serialize + Debug;
 

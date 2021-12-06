@@ -46,7 +46,7 @@ mod request {
     use crate::logout::Logout;
     use crate::message::ack::MessageAck;
     use crate::message::poll::MessagePoll;
-    use crate::request::EppRequest;
+    use crate::request::Transaction;
     use crate::xml::EppXml;
     use chrono::{DateTime, NaiveDate};
     use std::str::FromStr;
