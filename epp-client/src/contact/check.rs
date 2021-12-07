@@ -92,3 +92,33 @@ pub struct ContactCheckResponse {
     #[serde(rename = "chkData")]
     pub check_data: ContactCheckResponseData,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::ContactCheck;
+    use crate::request::Transaction;
+    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+
+    #[test]
+    fn contact_check() {
+        let xml = get_xml("response/contact/check.xml").unwrap();
+        let object = ContactCheck::deserialize_response(xml.as_str()).unwrap();
+
+        let results = object.res_data().unwrap();
+
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(
+            results.check_data.contact_list[0].contact.id,
+            "eppdev-contact-1".into()
+        );
+        assert_eq!(results.check_data.contact_list[0].contact.available, 0);
+        assert_eq!(
+            results.check_data.contact_list[1].contact.id,
+            "eppdev-contact-2".into()
+        );
+        assert_eq!(results.check_data.contact_list[1].contact.available, 1);
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
+}

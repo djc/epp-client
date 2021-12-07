@@ -278,3 +278,42 @@ pub struct Greeting {
     /// Data under the <dcp> element
     pub dcp: Dcp,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{ExpiryType, Greeting, Relative};
+    use crate::common::EppObject;
+    use crate::tests::get_xml;
+    use crate::xml::EppXml;
+
+    #[test]
+    fn greeting() {
+        let xml = get_xml("response/greeting.xml").unwrap();
+        let object = EppObject::<Greeting>::deserialize(xml.as_str()).unwrap();
+
+        assert_eq!(object.data.service_id, "ISPAPI EPP Server");
+        assert_eq!(object.data.service_date, "2021-07-25T14:51:17.0Z");
+        assert_eq!(object.data.svc_menu.options.version, "1.0".into());
+        assert_eq!(object.data.svc_menu.options.lang, "en".into());
+        assert_eq!(object.data.svc_menu.services.obj_uris.len(), 4);
+        assert_eq!(
+            object
+                .data
+                .svc_menu
+                .services
+                .svc_ext
+                .unwrap()
+                .ext_uris
+                .unwrap()
+                .len(),
+            5
+        );
+        assert_eq!(object.data.dcp.statement.len(), 2);
+        assert_eq!(
+            object.data.dcp.expiry.unwrap().ty,
+            ExpiryType::Relative(Relative {
+                relative: "P1M".into()
+            })
+        );
+    }
+}

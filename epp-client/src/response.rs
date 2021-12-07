@@ -117,3 +117,26 @@ impl<T, E: ElementName> Response<T, E> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::ResponseStatus;
+    use crate::common::EppObject;
+    use crate::tests::{get_xml, CLTRID, SVTRID};
+    use crate::xml::EppXml;
+
+    #[test]
+    fn error() {
+        let xml = get_xml("response/error.xml").unwrap();
+        let object = EppObject::<ResponseStatus>::deserialize(xml.as_str()).unwrap();
+
+        assert_eq!(object.data.result.code, 2303);
+        assert_eq!(object.data.result.message, "Object does not exist".into());
+        assert_eq!(
+            object.data.result.ext_value.unwrap().reason,
+            "545 Object not found".into()
+        );
+        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+    }
+}
