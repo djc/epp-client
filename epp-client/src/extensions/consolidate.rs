@@ -96,11 +96,11 @@ pub struct SyncWithNameStore {
     pub namestore: NameStore,
 }
 
-
 #[cfg(test)]
 mod tests {
-    use super::{GMonthDay, Sync};
+    use super::{GMonthDay, Sync, SyncWithNameStore};
     use crate::domain::update::{DomainChangeInfo, DomainUpdate};
+    use crate::extensions::namestore::NameStore;
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID};
 
@@ -122,6 +122,37 @@ mod tests {
         let serialized = <DomainUpdate as Transaction<Sync>>::serialize_request(
             object,
             Some(consolidate_ext),
+            CLTRID,
+        )
+        .unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn consolidate_namestore() {
+        let xml = get_xml("request/extensions/consolidate_namestore.xml").unwrap();
+
+        let exp = GMonthDay::new(5, 31, None).unwrap();
+
+        let consolidate_ext = Sync::new(exp);
+        let namestore_ext = NameStore::new("com");
+
+        let ext = SyncWithNameStore {
+            sync: consolidate_ext,
+            namestore: namestore_ext,
+        };
+
+        let mut object = DomainUpdate::new("eppdev.com");
+
+        object.info(DomainChangeInfo {
+            registrant: None,
+            auth_info: None,
+        });
+
+        let serialized = <DomainUpdate as Transaction<SyncWithNameStore>>::serialize_request(
+            object,
+            Some(ext),
             CLTRID,
         )
         .unwrap();
