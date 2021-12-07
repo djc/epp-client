@@ -106,7 +106,9 @@ pub struct DomainCreateResponse {
 #[cfg(test)]
 mod tests {
     use super::DomainCreate;
-    use crate::common::{DomainContact, HostAddr, HostAttr, HostAttrList, HostList, HostObjList};
+    use crate::common::{
+        DomainContact, HostAddr, HostAttr, HostAttrList, HostList, HostObjList, NoExtension,
+    };
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
@@ -138,7 +140,9 @@ mod tests {
             Some(contacts),
         );
 
-        let serialized = object.serialize_request(None, CLTRID).unwrap();
+        let serialized =
+            <DomainCreate as Transaction<NoExtension>>::serialize_request(object, None, CLTRID)
+                .unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -175,7 +179,9 @@ mod tests {
             Some(contacts),
         );
 
-        let serialized = object.serialize_request(None, CLTRID).unwrap();
+        let serialized =
+            <DomainCreate as Transaction<NoExtension>>::serialize_request(object, None, CLTRID)
+                .unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -224,7 +230,9 @@ mod tests {
             Some(contacts),
         );
 
-        let serialized = object.serialize_request(None, CLTRID).unwrap();
+        let serialized =
+            <DomainCreate as Transaction<NoExtension>>::serialize_request(object, None, CLTRID)
+                .unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -232,7 +240,8 @@ mod tests {
     #[test]
     fn response() {
         let xml = get_xml("response/domain/create.xml").unwrap();
-        let object = DomainCreate::deserialize_response(xml.as_str()).unwrap();
+        let object =
+            <DomainCreate as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
 
         let result = object.res_data().unwrap();
 

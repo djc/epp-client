@@ -75,7 +75,7 @@ pub struct HostCreateResponse {
 #[cfg(test)]
 mod tests {
     use super::HostCreate;
-    use crate::common::HostAddr;
+    use crate::common::{HostAddr, NoExtension};
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
@@ -90,7 +90,9 @@ mod tests {
 
         let object = HostCreate::new("host1.eppdev-1.com", addresses);
 
-        let serialized = object.serialize_request(None, CLTRID).unwrap();
+        let serialized =
+            <HostCreate as Transaction<NoExtension>>::serialize_request(object, None, CLTRID)
+                .unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -98,7 +100,8 @@ mod tests {
     #[test]
     fn response() {
         let xml = get_xml("response/host/create.xml").unwrap();
-        let object = HostCreate::deserialize_response(xml.as_str()).unwrap();
+        let object =
+            <HostCreate as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
 
         let result = object.res_data().unwrap();
 

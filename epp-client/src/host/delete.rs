@@ -46,6 +46,7 @@ pub struct HostDelete {
 #[cfg(test)]
 mod tests {
     use super::HostDelete;
+    use crate::common::NoExtension;
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
@@ -55,7 +56,9 @@ mod tests {
 
         let object = HostDelete::new("ns1.eppdev-1.com");
 
-        let serialized = object.serialize_request(None, CLTRID).unwrap();
+        let serialized =
+            <HostDelete as Transaction<NoExtension>>::serialize_request(object, None, CLTRID)
+                .unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -63,7 +66,8 @@ mod tests {
     #[test]
     fn response() {
         let xml = get_xml("response/host/delete.xml").unwrap();
-        let object = HostDelete::deserialize_response(xml.as_str()).unwrap();
+        let object =
+            <HostDelete as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
 
         assert_eq!(object.result.code, 1000);
         assert_eq!(object.result.message, SUCCESS_MSG.into());

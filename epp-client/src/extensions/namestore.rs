@@ -5,14 +5,111 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     common::{ElementName, NoExtension, StringValue},
-    domain::check::DomainCheck,
+    contact::{
+        check::ContactCheck, create::ContactCreate, delete::ContactDelete, info::ContactInfo,
+        update::ContactUpdate,
+    },
+    domain::{
+        check::DomainCheck, create::DomainCreate, delete::DomainDelete, info::DomainInfo,
+        renew::DomainRenew, transfer::DomainTransfer, update::DomainUpdate,
+    },
+    host::{
+        check::HostCheck, create::HostCreate, delete::HostDelete, info::HostInfo,
+        update::HostUpdate,
+    },
     request::Transaction,
 };
 
 pub const XMLNS: &str = "http://www.verisign-grs.com/epp/namestoreExt-1.1";
 
+// Contact
+
+impl Transaction<NameStore> for ContactCheck {
+    type Response = <ContactCheck as Transaction<NoExtension>>::Response;
+    type ExtensionResponse = NameStore;
+}
+
+impl Transaction<NameStore> for ContactCreate {
+    type Response = <ContactCreate as Transaction<NoExtension>>::Response;
+    type ExtensionResponse = NameStore;
+}
+
+impl Transaction<NameStore> for ContactDelete {
+    type Response = <ContactDelete as Transaction<NoExtension>>::Response;
+    type ExtensionResponse = NameStore;
+}
+
+impl Transaction<NameStore> for ContactInfo {
+    type Response = <ContactInfo as Transaction<NoExtension>>::Response;
+    type ExtensionResponse = NameStore;
+}
+
+impl Transaction<NameStore> for ContactUpdate {
+    type Response = <ContactUpdate as Transaction<NoExtension>>::Response;
+    type ExtensionResponse = NameStore;
+}
+
+// Domain
+
 impl Transaction<NameStore> for DomainCheck {
     type Response = <DomainCheck as Transaction<NoExtension>>::Response;
+    type ExtensionResponse = NameStore;
+}
+
+impl Transaction<NameStore> for DomainCreate {
+    type Response = <DomainCreate as Transaction<NoExtension>>::Response;
+    type ExtensionResponse = NameStore;
+}
+
+impl Transaction<NameStore> for DomainDelete {
+    type Response = <DomainDelete as Transaction<NoExtension>>::Response;
+    type ExtensionResponse = NameStore;
+}
+
+impl Transaction<NameStore> for DomainInfo {
+    type Response = <DomainInfo as Transaction<NoExtension>>::Response;
+    type ExtensionResponse = NameStore;
+}
+
+impl Transaction<NameStore> for DomainRenew {
+    type Response = <DomainRenew as Transaction<NoExtension>>::Response;
+    type ExtensionResponse = NameStore;
+}
+
+impl Transaction<NameStore> for DomainTransfer {
+    type Response = <DomainTransfer as Transaction<NoExtension>>::Response;
+    type ExtensionResponse = NameStore;
+}
+
+impl Transaction<NameStore> for DomainUpdate {
+    type Response = <DomainUpdate as Transaction<NoExtension>>::Response;
+    type ExtensionResponse = NameStore;
+}
+
+// Host
+
+impl Transaction<NameStore> for HostCheck {
+    type Response = <HostCheck as Transaction<NoExtension>>::Response;
+    type ExtensionResponse = NameStore;
+}
+
+impl Transaction<NameStore> for HostCreate {
+    type Response = <HostCreate as Transaction<NoExtension>>::Response;
+    type ExtensionResponse = NameStore;
+}
+
+impl Transaction<NameStore> for HostDelete {
+    type Response = <HostDelete as Transaction<NoExtension>>::Response;
+    type ExtensionResponse = NameStore;
+}
+
+impl Transaction<NameStore> for HostInfo {
+    type Response = <HostInfo as Transaction<NoExtension>>::Response;
+    type ExtensionResponse = NameStore;
+}
+
+impl Transaction<NameStore> for HostUpdate {
+    type Response = <HostUpdate as Transaction<NoExtension>>::Response;
     type ExtensionResponse = NameStore;
 }
 
