@@ -281,10 +281,18 @@ pub struct Greeting {
 
 #[cfg(test)]
 mod tests {
-    use super::{ExpiryType, Greeting, Relative};
+    use super::{ExpiryType, Greeting, Hello, Relative};
     use crate::common::EppObject;
     use crate::tests::get_xml;
     use crate::xml::EppXml;
+
+    #[test]
+    fn hello() {
+        let xml = get_xml("request/hello.xml").unwrap();
+        let serialized = EppObject::<Hello>::build(Hello).serialize().unwrap();
+
+        assert_eq!(xml, serialized);
+    }
 
     #[test]
     fn greeting() {

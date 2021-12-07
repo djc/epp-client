@@ -81,3 +81,36 @@ pub struct Sync {
     #[serde(rename = "sync:expMonthDay", alias = "sync")]
     pub exp: StringValue,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{GMonthDay, Sync};
+    use crate::domain::update::{DomainChangeInfo, DomainUpdate};
+    use crate::request::Transaction;
+    use crate::tests::{get_xml, CLTRID};
+
+    #[test]
+    fn command() {
+        let xml = get_xml("request/extensions/consolidate.xml").unwrap();
+
+        let exp = GMonthDay::new(5, 31, None).unwrap();
+
+        let consolidate_ext = Sync::new(exp);
+
+        let mut object = DomainUpdate::new("eppdev.com");
+
+        object.info(DomainChangeInfo {
+            registrant: None,
+            auth_info: None,
+        });
+
+        let serialized = <DomainUpdate as Transaction<Sync>>::serialize_request(
+            object,
+            Some(consolidate_ext),
+            CLTRID,
+        )
+        .unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+}
