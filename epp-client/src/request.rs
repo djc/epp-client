@@ -75,14 +75,3 @@ impl<T: ElementName + Serialize, E: ElementName + Serialize> Serialize for Comma
         state.end()
     }
 }
-
-impl<T: ElementName, E: ElementName> Command<T, E> {
-    /// Creates a new &lt;command&gt; tag for an EPP document with a containing &lt;extension&gt; tag
-    pub fn build(command: T, ext: E, client_tr_id: &str) -> Command<T, E> {
-        Command {
-            command,
-            extension: Some(Extension { data: ext }),
-            client_tr_id: client_tr_id.into(),
-        }
-    }
-}

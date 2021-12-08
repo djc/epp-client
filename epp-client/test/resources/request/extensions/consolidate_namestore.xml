@@ -15,6 +15,6 @@
                 <namestoreExt:subProduct>com</namestoreExt:subProduct>
             </namestoreExt:namestoreExt>
         </extension>
-        <clTRID>abc123</clTRID>
+        <clTRID>cltrid:1626454866</clTRID>
     </command>
 </epp>
