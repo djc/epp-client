@@ -4,7 +4,7 @@ use epp_client_macros::*;
 
 use crate::{
     common::{
-        DomainAuthInfo, DomainContact, DomainStatus, ElementName, HostList, NoExtension,
+        DomainAuthInfo, DomainContact, DomainStatus, ElementName, Extension, HostList, NoExtension,
         StringValue,
     },
     request::Transaction,
@@ -15,6 +15,7 @@ use super::XMLNS;
 use serde::{Deserialize, Serialize};
 
 impl Transaction<NoExtension> for DomainUpdate {
+    type ExtensionWrapper = Extension<NoExtension>;
     type Response = ();
     type ExtensionResponse = NoExtension;
 }

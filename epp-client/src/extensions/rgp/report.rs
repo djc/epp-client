@@ -3,7 +3,7 @@
 use epp_client_macros::*;
 
 use crate::{
-    common::{ElementName, NoExtension, StringValue},
+    common::{ElementName, NoExtension, StringValue, Extension},
     domain::update::DomainUpdate,
     request::Transaction,
 };
@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 use super::XMLNS;
 
 impl Transaction<RgpRestoreReport> for DomainUpdate {
+    type ExtensionWrapper = Extension<RgpRestoreReport>;
     type Response = ();
     type ExtensionResponse = NoExtension;
 }

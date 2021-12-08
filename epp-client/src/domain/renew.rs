@@ -3,12 +3,13 @@
 use epp_client_macros::*;
 
 use super::XMLNS;
-use crate::common::{ElementName, NoExtension, Period, StringValue};
+use crate::common::{ElementName, NoExtension, Period, StringValue, Extension};
 use crate::request::Transaction;
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
 impl Transaction<NoExtension> for DomainRenew {
+    type ExtensionWrapper = Extension<NoExtension>;
     type Response = DomainRenewResponse;
     type ExtensionResponse = NoExtension;
 }

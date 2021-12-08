@@ -3,11 +3,12 @@
 use epp_client_macros::*;
 
 use super::XMLNS;
-use crate::common::{ElementName, NoExtension, StringValue};
+use crate::common::{ElementName, NoExtension, StringValue, Extension};
 use crate::request::Transaction;
 use serde::{Deserialize, Serialize};
 
 impl Transaction<NoExtension> for DomainCheck {
+    type ExtensionWrapper = Extension<NoExtension>;
     type Response = DomainCheckResponse;
     type ExtensionResponse = NoExtension;
 }

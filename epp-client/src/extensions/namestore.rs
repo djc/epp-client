@@ -4,7 +4,7 @@ use epp_client_macros::ElementName;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    common::{ElementName, NoExtension, StringValue},
+    common::{ElementName, NoExtension, StringValue, Extension},
     contact::{
         check::ContactCheck, create::ContactCreate, delete::ContactDelete, info::ContactInfo,
         update::ContactUpdate,
@@ -25,26 +25,31 @@ pub const XMLNS: &str = "http://www.verisign-grs.com/epp/namestoreExt-1.1";
 // Contact
 
 impl Transaction<NameStore> for ContactCheck {
+    type ExtensionWrapper = Extension<NameStore>;
     type Response = <ContactCheck as Transaction<NoExtension>>::Response;
     type ExtensionResponse = NameStore;
 }
 
 impl Transaction<NameStore> for ContactCreate {
+    type ExtensionWrapper = Extension<NameStore>;
     type Response = <ContactCreate as Transaction<NoExtension>>::Response;
     type ExtensionResponse = NameStore;
 }
 
 impl Transaction<NameStore> for ContactDelete {
+    type ExtensionWrapper = Extension<NameStore>;
     type Response = <ContactDelete as Transaction<NoExtension>>::Response;
     type ExtensionResponse = NameStore;
 }
 
 impl Transaction<NameStore> for ContactInfo {
+    type ExtensionWrapper = Extension<NameStore>;
     type Response = <ContactInfo as Transaction<NoExtension>>::Response;
     type ExtensionResponse = NameStore;
 }
 
 impl Transaction<NameStore> for ContactUpdate {
+    type ExtensionWrapper = Extension<NameStore>;
     type Response = <ContactUpdate as Transaction<NoExtension>>::Response;
     type ExtensionResponse = NameStore;
 }
@@ -52,36 +57,43 @@ impl Transaction<NameStore> for ContactUpdate {
 // Domain
 
 impl Transaction<NameStore> for DomainCheck {
+    type ExtensionWrapper = Extension<NameStore>;
     type Response = <DomainCheck as Transaction<NoExtension>>::Response;
     type ExtensionResponse = NameStore;
 }
 
 impl Transaction<NameStore> for DomainCreate {
+    type ExtensionWrapper = Extension<NameStore>;
     type Response = <DomainCreate as Transaction<NoExtension>>::Response;
     type ExtensionResponse = NameStore;
 }
 
 impl Transaction<NameStore> for DomainDelete {
+    type ExtensionWrapper = Extension<NameStore>;
     type Response = <DomainDelete as Transaction<NoExtension>>::Response;
     type ExtensionResponse = NameStore;
 }
 
 impl Transaction<NameStore> for DomainInfo {
+    type ExtensionWrapper = Extension<NameStore>;
     type Response = <DomainInfo as Transaction<NoExtension>>::Response;
     type ExtensionResponse = NameStore;
 }
 
 impl Transaction<NameStore> for DomainRenew {
+    type ExtensionWrapper = Extension<NameStore>;
     type Response = <DomainRenew as Transaction<NoExtension>>::Response;
     type ExtensionResponse = NameStore;
 }
 
 impl Transaction<NameStore> for DomainTransfer {
+    type ExtensionWrapper = Extension<NameStore>;
     type Response = <DomainTransfer as Transaction<NoExtension>>::Response;
     type ExtensionResponse = NameStore;
 }
 
 impl Transaction<NameStore> for DomainUpdate {
+    type ExtensionWrapper = Extension<NameStore>;
     type Response = <DomainUpdate as Transaction<NoExtension>>::Response;
     type ExtensionResponse = NameStore;
 }
@@ -89,26 +101,31 @@ impl Transaction<NameStore> for DomainUpdate {
 // Host
 
 impl Transaction<NameStore> for HostCheck {
+    type ExtensionWrapper = Extension<NameStore>;
     type Response = <HostCheck as Transaction<NoExtension>>::Response;
     type ExtensionResponse = NameStore;
 }
 
 impl Transaction<NameStore> for HostCreate {
+    type ExtensionWrapper = Extension<NameStore>;
     type Response = <HostCreate as Transaction<NoExtension>>::Response;
     type ExtensionResponse = NameStore;
 }
 
 impl Transaction<NameStore> for HostDelete {
+    type ExtensionWrapper = Extension<NameStore>;
     type Response = <HostDelete as Transaction<NoExtension>>::Response;
     type ExtensionResponse = NameStore;
 }
 
 impl Transaction<NameStore> for HostInfo {
+    type ExtensionWrapper = Extension<NameStore>;
     type Response = <HostInfo as Transaction<NoExtension>>::Response;
     type ExtensionResponse = NameStore;
 }
 
 impl Transaction<NameStore> for HostUpdate {
+    type ExtensionWrapper = Extension<NameStore>;
     type Response = <HostUpdate as Transaction<NoExtension>>::Response;
     type ExtensionResponse = NameStore;
 }

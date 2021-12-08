@@ -3,12 +3,13 @@
 use epp_client_macros::*;
 
 use super::XMLNS;
-use crate::common::{ElementName, NoExtension, StringValue};
+use crate::common::{ElementName, NoExtension, StringValue, Extension};
 use crate::request::Transaction;
 use crate::response::ResponseStatus;
 use serde::{Deserialize, Serialize};
 
 impl Transaction<NoExtension> for DomainDelete {
+    type ExtensionWrapper = Extension<NoExtension>;
     type Response = ResponseStatus;
     type ExtensionResponse = NoExtension;
 }

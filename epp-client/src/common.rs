@@ -107,6 +107,12 @@ impl<E: ElementName + Serialize> Serialize for Extension<E> {
     }
 }
 
+impl<E: ElementName + Serialize> From<E> for Extension<E> {
+    fn from(data: E) -> Self {
+        Self { data }
+    }
+}
+
 /// The <svcExtension> type in EPP XML
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 #[serde(rename = "svcExtension")]

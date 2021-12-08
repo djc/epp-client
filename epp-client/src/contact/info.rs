@@ -4,12 +4,14 @@ use epp_client_macros::*;
 
 use super::XMLNS;
 use crate::common::{
-    ContactAuthInfo, ContactStatus, ElementName, NoExtension, Phone, PostalInfo, StringValue,
+    ContactAuthInfo, ContactStatus, ElementName, Extension, NoExtension, Phone, PostalInfo,
+    StringValue,
 };
 use crate::request::Transaction;
 use serde::{Deserialize, Serialize};
 
 impl Transaction<NoExtension> for ContactInfo {
+    type ExtensionWrapper = Extension<NoExtension>;
     type Response = ContactInfoResponse;
     type ExtensionResponse = NoExtension;
 }

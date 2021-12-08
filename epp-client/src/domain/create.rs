@@ -4,12 +4,14 @@ use epp_client_macros::*;
 
 use super::XMLNS;
 use crate::common::{
-    DomainAuthInfo, DomainContact, ElementName, HostList, NoExtension, Period, StringValue,
+    DomainAuthInfo, DomainContact, ElementName, Extension, HostList, NoExtension, Period,
+    StringValue,
 };
 use crate::request::Transaction;
 use serde::{Deserialize, Serialize};
 
 impl Transaction<NoExtension> for DomainCreate {
+    type ExtensionWrapper = Extension<NoExtension>;
     type Response = DomainCreateResponse;
     type ExtensionResponse = NoExtension;
 }

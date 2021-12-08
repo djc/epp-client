@@ -7,7 +7,7 @@ use epp_client_macros::ElementName;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    common::{ElementName, NoExtension, StringValue},
+    common::{ElementName, NoExtension, StringValue, Extension},
     domain::update::DomainUpdate,
     request::Transaction,
 };
@@ -17,6 +17,7 @@ use super::namestore::NameStore;
 pub const XMLNS: &str = "http://www.verisign.com/epp/sync-1.0";
 
 impl Transaction<Sync> for DomainUpdate {
+    type ExtensionWrapper = Extension<Sync>;
     type Response = <DomainUpdate as Transaction<NoExtension>>::Response;
     type ExtensionResponse = NoExtension;
 }

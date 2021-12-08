@@ -3,11 +3,12 @@
 use epp_client_macros::*;
 
 use super::XMLNS;
-use crate::common::{ElementName, HostAddr, HostStatus, NoExtension, StringValue};
+use crate::common::{ElementName, Extension, HostAddr, HostStatus, NoExtension, StringValue};
 use crate::request::Transaction;
 use serde::{Deserialize, Serialize};
 
 impl Transaction<NoExtension> for HostInfo {
+    type ExtensionWrapper = Extension<NoExtension>;
     type Response = HostInfoResponse;
     type ExtensionResponse = NoExtension;
 }

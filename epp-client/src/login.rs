@@ -4,12 +4,15 @@ use epp_client_macros::ElementName;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    common::{ElementName, NoExtension, Options, ServiceExtension, Services, StringValue},
+    common::{
+        ElementName, Extension, NoExtension, Options, ServiceExtension, Services, StringValue,
+    },
     contact, domain, host,
     request::{Transaction, EPP_LANG, EPP_VERSION},
 };
 
 impl Transaction<NoExtension> for Login {
+    type ExtensionWrapper = Extension<NoExtension>;
     type Response = ();
     type ExtensionResponse = NoExtension;
 }

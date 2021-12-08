@@ -4,11 +4,12 @@ use epp_client_macros::ElementName;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    common::{ElementName, NoExtension},
+    common::{ElementName, Extension, NoExtension},
     request::Transaction,
 };
 
 impl Transaction<NoExtension> for Logout {
+    type ExtensionWrapper = Extension<NoExtension>;
     type Response = ();
     type ExtensionResponse = NoExtension;
 }

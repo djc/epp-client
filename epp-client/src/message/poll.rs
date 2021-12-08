@@ -1,10 +1,11 @@
 use epp_client_macros::*;
 
-use crate::common::{ElementName, NoExtension, StringValue};
+use crate::common::{ElementName, Extension, NoExtension, StringValue};
 use crate::request::Transaction;
 use serde::{Deserialize, Serialize};
 
 impl Transaction<NoExtension> for MessagePoll {
+    type ExtensionWrapper = Extension<NoExtension>;
     type Response = MessagePollResponse;
     type ExtensionResponse = NoExtension;
 }

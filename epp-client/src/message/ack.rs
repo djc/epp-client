@@ -2,11 +2,12 @@
 
 use epp_client_macros::*;
 
-use crate::common::{ElementName, NoExtension};
+use crate::common::{ElementName, Extension, NoExtension};
 use crate::request::Transaction;
 use serde::{Deserialize, Serialize};
 
 impl Transaction<NoExtension> for MessageAck {
+    type ExtensionWrapper = Extension<NoExtension>;
     type Response = String;
     type ExtensionResponse = NoExtension;
 }
