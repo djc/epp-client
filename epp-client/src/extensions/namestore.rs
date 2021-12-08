@@ -141,7 +141,7 @@ impl NameStore {
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
-#[element_name(name = "namestoreExt:namestoreExt")]
+#[serde(rename = "namestoreExt:namestoreExt")]
 /// Type for EPP XML &lt;namestoreExt&gt; extension
 pub struct NameStore {
     /// XML namespace for the RGP restore extension

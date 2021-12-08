@@ -23,6 +23,7 @@ impl Transaction<Sync> for DomainUpdate {
 }
 
 impl Transaction<SyncWithNameStore> for DomainUpdate {
+    type ExtensionWrapper = Wrapper;
     type Response = <DomainUpdate as Transaction<NoExtension>>::Response;
     type ExtensionResponse = NameStore;
 }
@@ -79,7 +80,7 @@ impl Sync {
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
-#[element_name(name = "sync:update")]
+#[serde(rename = "sync:update")]
 /// Type for EPP XML &lt;consolidate&gt; extension
 pub struct Sync {
     /// XML namespace for the consolidate extension
@@ -93,8 +94,20 @@ pub struct Sync {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "extension")]
 pub struct SyncWithNameStore {
+    #[serde(rename = "sync:update")]
     pub sync: Sync,
+    #[serde(rename = "namestoreExt:namestoreExt")]
     pub namestore: NameStore,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(transparent)]
+pub struct Wrapper(SyncWithNameStore);
+
+impl From<SyncWithNameStore> for Wrapper {
+    fn from(inner: SyncWithNameStore) -> Self {
+        Self(inner)
+    }
 }
 
 #[cfg(test)]
@@ -134,7 +147,7 @@ mod tests {
     fn consolidate_namestore() {
         let xml = get_xml("request/extensions/consolidate_namestore.xml").unwrap();
 
-        let exp = GMonthDay::new(5, 31, None).unwrap();
+        let exp = GMonthDay::new(1, 15, None).unwrap();
 
         let consolidate_ext = Sync::new(exp);
         let namestore_ext = NameStore::new("com");
@@ -158,6 +171,6 @@ mod tests {
         )
         .unwrap();
 
-        assert_eq!(xml, serialized);
+        similar_asserts::assert_eq!(xml, serialized);
     }
 }
